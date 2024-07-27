@@ -13,6 +13,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@tiptap/pm": "^2.5.7",
+    "@tiptap/starter-kit": "^2.5.7",
+    "@tiptap/vue-3": "^2.5.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.416.0",
@@ -25,6 +28,7 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
+    "@tailwindcss/typography": "^0.5.13",
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.14.12",
     "@vitejs/plugin-vue": "^5.0.5",
