@@ -90,6 +90,16 @@ function getTriggerContentTypography(editor: Editor): keyof typeof icons {
 
   return 'Pilcrow'
 }
+
+function handleViewLink(link: string) {
+  if (link) {
+    const a = document.createElement('a')
+    a.href = link
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer' // Thêm thuộc tính bảo mật
+    a.click()
+  }
+}
 </script>
 
 <template>
@@ -214,16 +224,30 @@ function getTriggerContentTypography(editor: Editor): keyof typeof icons {
         <div class="space-y-2">
           <div v-bind="labelInsidePopoverContentConfig">Link</div>
           <form class="flex flex-col space-y-3" @submit.prevent="setLink">
-            <div class="flex space-x-2">
-              <Input
-                placeholder="https://"
-                name="link"
-                :default-value="editor.getAttributes('link').href"
-              />
-              <Button type="submit">
+            <div class="flex space-x-1">
+              <div class="relative w-full max-w-sm items-center">
+                <Input
+                  placeholder="https://"
+                  name="link"
+                  class="h-9"
+                  :default-value="editor.getAttributes('link').href"
+                />
+                <span
+                  class="absolute end-0 inset-y-0 flex items-center justify-center px-2 cursor-pointer"
+                >
+                  <IconLucideComponent
+                    @click="handleViewLink(editor.getAttributes('link').href)"
+                    v-if="editor.isActive('link')"
+                    name="Eye"
+                    class="w-4 h-4 text-muted-foreground"
+                  />
+                </span>
+              </div>
+              <Button type="submit" size="sm">
                 <IconLucideComponent name="Link2" v-bind="bubbleIconConfig" />
               </Button>
               <Button
+                size="sm"
                 type="button"
                 v-if="editor.isActive('link')"
                 @click="editor.chain().focus().unsetLink().run()"
