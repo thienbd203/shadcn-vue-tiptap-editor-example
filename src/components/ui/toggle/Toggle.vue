@@ -3,6 +3,7 @@ import { type HTMLAttributes, computed } from 'vue'
 import { Toggle, type ToggleEmits, type ToggleProps, useForwardPropsEmits } from 'radix-vue'
 import { type ToggleVariants, toggleVariants } from '.'
 import { cn } from '@/lib/utils'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const props = withDefaults(
   defineProps<
@@ -10,6 +11,7 @@ const props = withDefaults(
       class?: HTMLAttributes['class']
       variant?: ToggleVariants['variant']
       size?: ToggleVariants['size']
+      ariaLabel?: string
     }
   >(),
   {

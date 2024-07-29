@@ -3,7 +3,7 @@ import * as icons from 'lucide-vue-next'
 import { computed } from 'vue'
 
 interface IconProps {
-  name: keyof typeof icons
+  name: keyof typeof icons // Visit https://lucide.dev/icons to see all available icons
   size?: number
   color?: string
   strokeWidth?: number
