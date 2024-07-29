@@ -5,6 +5,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import IconLucideComponent from '@/components/ui/icons/IconLucideComponent.vue'
 import { Toggle, type ToggleVariants } from '@/components/ui/toggle'
 import { icons } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Link } from '@tiptap/extension-link'
 
 type Level = 1 | 2 | 3 | 4 | 5 | 6
 
@@ -15,22 +18,30 @@ const bubbleIconConfig = {
   class: 'w-4 h-4'
 }
 
-const buttonSize = 'sm'
+const labelInsidePopoverContentConfig = {
+  class: 'text-[.65rem] font-semibold mb-1 uppercase text-neutral-500 dark:text-neutral-400 px-1.5'
+}
+const bubbleButtonSize = 'sm'
 
 const bubbleToggleConfig = {
   class: 'text-muted-foreground hover:text-accent-foreground',
-  size: buttonSize as ToggleVariants['size']
+  size: bubbleButtonSize as ToggleVariants['size']
 }
 
 const bubbleToggleInsidePopoverContentConfig = {
   class:
     'text-muted-foreground hover:text-accent-foreground flex items-center gap-2 p-1.5 text-sm !justify-start',
-  size: buttonSize as ToggleVariants['size']
+  size: bubbleButtonSize as ToggleVariants['size']
 }
 
 const editor = useEditor({
   content: `Tiptap content`,
-  extensions: [StarterKit],
+  extensions: [
+    StarterKit,
+    Link.configure({
+      openOnClick: false
+    })
+  ],
   editorProps: {
     attributes: {
       class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none'
@@ -38,8 +49,25 @@ const editor = useEditor({
   }
 })
 
-function getPopoverContentClass(): string {
-  return 'w-[151px] flex flex-col gap-1 px-2 py-4 bg-white rounded-lg dark:bg-black shadow-sm border border-neutral-200 shadow-sm'
+const popoverContentHierarchyConfig = {
+  class:
+    'w-[151px] flex flex-col gap-1 px-2 py-4 bg-white rounded-lg dark:bg-black shadow-sm border border-neutral-200 shadow-sm'
+}
+
+const popoverContentLinkConfig = {
+  class:
+    'w-[350px] flex flex-col gap-1 px-2 py-4 bg-white rounded-lg dark:bg-black shadow-sm border border-neutral-200 shadow-sm'
+}
+
+function setLink(event: Event) {
+  const target = event.target as HTMLFormElement
+  const linkInput = target.elements.namedItem('link') as HTMLInputElement
+
+  if (linkInput.value) {
+    editor.value?.chain().focus().setLink({ href: linkInput.value }).run()
+  }
+
+  return
 }
 
 function getTriggerContentTypography(editor: Editor): keyof typeof icons {
@@ -85,13 +113,9 @@ function getTriggerContentTypography(editor: Editor): keyof typeof icons {
           />
         </Toggle>
       </PopoverTrigger>
-      <PopoverContent :class="getPopoverContentClass()">
+      <PopoverContent v-bind="popoverContentHierarchyConfig">
         <div class="space-y-3">
-          <div
-            class="text-[.65rem] font-semibold mb-1 uppercase text-neutral-500 dark:text-neutral-400 px-1.5"
-          >
-            Hierarchy
-          </div>
+          <div v-bind="labelInsidePopoverContentConfig">Hierarchy</div>
           <div class="space-y-1 flex flex-col">
             <Toggle
               :pressed="editor.isActive('paragraph')"
@@ -118,11 +142,7 @@ function getTriggerContentTypography(editor: Editor): keyof typeof icons {
           </div>
         </div>
         <div class="space-y-2">
-          <div
-            class="text-[.65rem] font-semibold mb-1 uppercase text-neutral-500 dark:text-neutral-400 px-1.5"
-          >
-            LISTS
-          </div>
+          <div v-bind="labelInsidePopoverContentConfig">LISTS</div>
           <div class="space-y-1 flex flex-col">
             <Toggle
               :pressed="editor.isActive('bulletList')"
@@ -184,6 +204,43 @@ function getTriggerContentTypography(editor: Editor): keyof typeof icons {
     >
       <IconLucideComponent name="CodeXml" v-bind="bubbleIconConfig" />
     </Toggle>
+    <Popover>
+      <PopoverTrigger>
+        <Toggle v-bind="bubbleToggleConfig" :pressed="editor.isActive('link')">
+          <IconLucideComponent name="Link2" v-bind="bubbleIconConfig" />
+        </Toggle>
+      </PopoverTrigger>
+      <PopoverContent v-bind="popoverContentLinkConfig">
+        <div class="space-y-2">
+          <div v-bind="labelInsidePopoverContentConfig">Link</div>
+          <form class="flex flex-col space-y-3" @submit.prevent="setLink">
+            <div class="flex space-x-2">
+              <Input
+                placeholder="https://"
+                name="link"
+                :default-value="editor.getAttributes('link').href"
+              />
+              <Button type="submit">
+                <IconLucideComponent name="Link2" v-bind="bubbleIconConfig" />
+              </Button>
+              <Button
+                type="button"
+                v-if="editor.isActive('link')"
+                @click="editor.chain().focus().unsetLink().run()"
+                variant="destructive"
+              >
+                <IconLucideComponent name="Link2Off" v-bind="bubbleIconConfig" />
+              </Button>
+            </div>
+            <div class="space-y-1" v-bind="labelInsidePopoverContentConfig">
+              <p>- https://, http://, www. : to link to an external resource.</p>
+              <p>- mailto: : to link to an email address.</p>
+              <p>- tel: : to link to a phone number.</p>
+            </div>
+          </form>
+        </div>
+      </PopoverContent>
+    </Popover>
   </bubble-menu>
   <div class="border rounded-md">
     <editor-content :editor="editor" />
