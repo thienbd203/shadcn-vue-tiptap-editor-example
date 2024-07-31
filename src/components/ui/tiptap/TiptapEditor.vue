@@ -8,6 +8,10 @@ import { icons } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Link } from '@tiptap/extension-link'
+import { Label } from 'radix-vue'
+import { Color } from '@tiptap/extension-color'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { BackgroundColor } from '@/components/ui/tiptap/extension/background-color'
 
 type Level = 1 | 2 | 3 | 4 | 5 | 6
 
@@ -38,6 +42,13 @@ const editor = useEditor({
   content: `Tiptap content`,
   extensions: [
     StarterKit,
+    Color.configure({
+      types: ['textStyle']
+    }),
+    BackgroundColor.configure({
+      types: ['textStyle']
+    }),
+    TextStyle,
     Link.configure({
       openOnClick: false
     })
@@ -96,7 +107,7 @@ function handleViewLink(link: string) {
     const a = document.createElement('a')
     a.href = link
     a.target = '_blank'
-    a.rel = 'noopener noreferrer' // Thêm thuộc tính bảo mật
+    a.rel = 'noopener noreferrer'
     a.click()
   }
 }
@@ -265,6 +276,50 @@ function handleViewLink(link: string) {
         </div>
       </PopoverContent>
     </Popover>
+    <Toggle
+      v-bind="bubbleToggleConfig"
+      :pressed="editor.getAttributes('textStyle').color !== null"
+      class="cursor-pointer relative p-0"
+    >
+      <Label for="colorPicker" class="cursor-pointer px-2.5">
+        <IconLucideComponent name="Palette" v-bind="bubbleIconConfig" />
+        <Input
+          id="colorPicker"
+          class="opacity-0 absolute cursor-pointer w-100 h-100"
+          type="color"
+          @update:modelValue="
+            editor
+              .chain()
+              .focus()
+              .setColor($event as string)
+              .run()
+          "
+          :value="editor.getAttributes('textStyle').color ?? '#000000'"
+        />
+      </Label>
+    </Toggle>
+    <Toggle
+      v-bind="bubbleToggleConfig"
+      :pressed="editor.getAttributes('textStyle').backgroundColor !== null"
+      class="cursor-pointer relative p-0"
+    >
+      <Label for="bgColorPicker" class="cursor-pointer px-2.5">
+        <IconLucideComponent name="Palette" v-bind="bubbleIconConfig" />
+        <Input
+          id="bgColorPicker"
+          class="opacity-0 absolute cursor-pointer w-100 h-100"
+          type="color"
+          @update:modelValue="
+            editor
+              .chain()
+              .focus()
+              .setBackgroundColor($event as string)
+              .run()
+          "
+          :value="editor.getAttributes('textStyle').backgroundColor ?? '#000000'"
+        />
+      </Label>
+    </Toggle>
   </bubble-menu>
   <div class="border rounded-md">
     <editor-content :editor="editor" />
