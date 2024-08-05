@@ -61,7 +61,6 @@ export const BackgroundColor = Extension.create<BackgroundColorOptions>({
       setBackgroundColor:
         (color) =>
         ({ chain }) => {
-          console.log(color)
           return chain().setMark('textStyle', { backgroundColor: color }).run()
         },
       unsetBackgroundColor:
